@@ -1,0 +1,45 @@
+name: Build Cordova APK for بازی شهر ابری اعداد
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # دریافت سورس‌کد از ریپو
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # نصب Node.js و Cordova
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Cordova globally
+        run: npm install -g cordova
+
+      # ساخت پروژه Cordova موقت و جایگذاری سورس HTML/JS/CSS
+      - name: Create Cordova project
+        run: |
+          cordova create cloudcity com.irgame.cloudcity CloudCityGame
+          cp -r بازی\ شهر\ ابری\ اعداد/* cloudcity/www/
+          cd cloudcity
+          cordova platform add android
+
+      # بیلد APK
+      - name: Build Android APK
+        run: |
+          cd cloudcity
+          cordova build android --release
+
+      # انتشار فایل APK در خروجی Actions
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CloudCityGame-APK
+          path: cloudcity/platforms/android/app/build/outputs/apk/release/*.apk
