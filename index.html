@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>شهر ابری اعداد</title>
+<style>
+/* Import nice Persian fonts */
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lalezar&display=swap');
+
+:root {
+--correct-color: #27ae60;
+--incorrect-color: #c0392b;
+--primary-blue: #3498db;
+--primary-red: #e74c3c;
+--primary-yellow: #f1c40f;
+--primary-purple: #9b59b6;
+--primary-green: #2ecc71;
+--keypad-bg: #7f8c8d;
+--keypad-shadow: #606c6d;
+}
+
+body {
+font-family: 'Vazirmatn', sans-serif;
+background: linear-gradient(to top, #89cff0, #cdeefd); /* Sky blue gradient */
+display: flex;
+justify-content: center;
+align-items: center;
+min-height: 100vh;
+margin: 0;
+color: #333;
+text-align: center;
+user-select: none;
+overflow: hidden;
+direction: rtl;
+unicode-bidi: embed;
+position: relative; /* برای موقعیت‌دهی مطلق ابرها */
+}
+
+/* --- Animated Clouds Background --- */
+.cloud {
+position: absolute;
+background: #fff;
+border-radius: 50%;
+opacity: 0.8;
+filter: blur(1px);
+animation: drift linear infinite;
+z-index: 1;
+}
+.cloud::before, .cloud::after {
+content: '';
+position: absolute;
+background: #fff;
+border-radius: 50%;
+}
+.cloud.x1 { top: 10%; left: -250px; width: 200px; height: 60px; animation-duration: 25s; }
+.cloud.x1::before { left: 50px; top: -30px; width: 60px; height: 60px; }
+.cloud.x1::after { right: 40px; top: -40px; width: 80px; height: 80px; }
+.cloud.x2 { top: 30%; left: -300px; width: 250px; height: 80px; animation-duration: 35s; animation-delay: -5s; }
+.cloud.x2::before { left: 60px; top: -40px; width: 80px; height: 80px; }
+.cloud.x2::after { right: 50px; top: -55px; width: 100px; height: 100px; }
+.cloud.x3 { top: 65%; left: -200px; width: 180px; height: 50px; animation-duration: 20s; animation-delay: -10s; }
+.cloud.x3::before { left: 40px; top: -25px; width: 50px; height: 50px; }
+.cloud.x3::after { right: 35px; top: -35px; width: 70px; height: 70px; }
+
+@keyframes drift {
+from { transform: translateX(0); }
+to { transform: translateX(calc(100vw + 300px)); }
+}
+
+.page-wrapper {
+display: flex;
+align-items: center;
+gap: 20px; /* کاهش فاصله برای چیدمان بهتر */
+z-index: 10;
+flex-wrap: wrap;
+justify-content: center;
+position: relative;
+}
+
+#character-mascot {
+width: 250px;
+height: 250px;
+z-index: 10;
+}
+#character-mascot img {
+width: 100%;
+height: 100%;
+transition: transform 0.3s ease;
+}
+.happy-animation { animation: bounce-happy 0.8s ease; }
+.sad-animation { animation: shake-sad 0.6s ease; }
+
+@keyframes bounce-happy {
+0%, 100% { transform: translateY(0); }
+50% { transform: translateY(-30px) scale(1.05); }
+}
+@keyframes shake-sad {
+0%, 100% { transform: translateX(0); }
+25% { transform: translateX(-8px) rotate(-3deg); }
+75% { transform: translateX(8px) rotate(3deg); }
+}
+
+.game-container {
+background-color: rgba(255, 255, 255, 0.95);
+padding: 30px 40px;
+border-radius: 30px;
+box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+width: 90%;
+max-width: 480px; /* کمی کوچکتر برای جا شدن بهتر */
+border: 5px solid #fff;
+transition: all 0.3s ease;
+z-index: 10;
+position: relative;
+}
+
+h1 {
+font-family: 'Lalezar', cursive;
+font-size: 2.8rem;
+color: #2c5d2c;
+margin-bottom: 15px;
+animation: pulse 2s infinite;
+}
+@keyframes pulse {
+0%, 100% { transform: scale(1); }
+50% { transform: scale(1.05); }
+}
+
+p {
+font-size: 1.3rem;
+margin-bottom: 25px;
+color: #555;
+}
+
+.operation-selector {
+display: flex;
+justify-content: center;
+gap: 15px;
+flex-wrap: wrap;
+margin-bottom: 30px;
+}
+
+.op-btn {
+font-family: 'Vazirmatn', sans-serif;
+font-size: 1.2rem;
+padding: 15px 25px;
+border: none;
+border-radius: 15px;
+cursor: pointer;
+transition: all 0.2s ease-in-out;
+color: white;
+font-weight: bold;
+box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+}
+.op-btn:hover {
+transform: translateY(-4px);
+box-shadow: 0 8px 10px rgba(0, 0, 0, 0.2);
+}
+.op-btn:active {
+transform: translateY(1px);
+box-shadow: 0 2px 0 rgba(0,0,0,0.2);
+}
+
+#add-btn { background-color: var(--primary-blue); }
+#subtract-btn { background-color: var(--primary-red); }
+#multiply-btn { background-color: var(--primary-yellow); color: #333;}
+#divide-btn { background-color: var(--primary-purple); }
+
+.game-area {
+margin-top: 20px;
+border-top: 2px dashed #ccc;
+padding-top: 20px;
+}
+
+.hidden { display: none; }
+
+#question-box {
+font-size: 3rem;
+font-weight: bold;
+margin: 20px 0;
+padding: 20px;
+background-color: #e8f5e9;
+border-radius: 15px;
+direction: ltr;
+color: #333;
+unicode-bidi: embed;
+text-align: center;
+}
+
+.answer-section {
+display: flex;
+justify-content: center;
+align-items: center;
+gap: 10px;
+margin: 20px 0;
+}
+
+#answer-input {
+font-family: 'Vazirmatn', sans-serif;
+font-size: 2.5rem; /* بزرگتر برای اعداد */
+width: 150px; /* کمی پهن‌تر */
+padding: 15px;
+border: 3px solid #ccc;
+border-radius: 15px;
+text-align: center;
+direction: ltr; /* اعداد از چپ به راست */
+unicode-bidi: embed;
+transition: border-color 0.2s;
+background-color: #fff;
+font-weight: bold;
+letter-spacing: 2px; /* فاصله بین اعداد */
+}
+#answer-input:focus {
+outline: none;
+border-color: var(--primary-green);
+box-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
+}
+
+/* استایل‌های اضافی برای اعداد فارسی */
+#answer-input::placeholder {
+color: #999;
+font-size: 1.5rem;
+direction: ltr;
+}
+
+/* حذف فلش‌های input number */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button { 
+-webkit-appearance: none; 
+margin: 0; 
+}
+input[type=number] { 
+-moz-appearance: textfield; 
+}
+
+#submit-btn {
+font-family: 'Vazirmatn', sans-serif;
+font-size: 1.2rem;
+padding: 18px 30px;
+background-color: var(--primary-green);
+color: white;
+border: none;
+border-radius: 10px;
+cursor: pointer;
+transition: all 0.2s;
+box-shadow: 0 4px 0 #27ae60;
+font-weight: bold;
+}
+#submit-btn:hover {
+background-color: #38d97e;
+transform: translateY(-2px);
+box-shadow: 0 6px 0 #27ae60;
+}
+#submit-btn:active {
+transform: translateY(1px);
+box-shadow: 0 2px 0 #27ae60;
+}
+
+#feedback {
+margin-top: 20px;
+font-size: 1.5rem;
+font-weight: bold;
+min-height: 40px;
+display: flex;
+justify-content: center;
+align-items: center;
+gap: 10px;
+}
+.correct { color: var(--correct-color); }
+.incorrect { color: var(--incorrect-color); }
+
+#score-area {
+margin-top: 20px;
+font-size: 1.3rem;
+color: #555;
+font-weight: bold;
+}
+
+/* --- استایل‌های جدید برای صفحه‌کلید دو ستونی --- */
+#virtual-keypad {
+display: none;
+flex-direction: row; /* چیدمان ستون‌ها در کنار هم */
+gap: 15px;
+align-items: flex-start; /* تراز از بالا */
+justify-content: center;
+margin-top: 20px;
+}
+#virtual-keypad.visible {
+display: flex;
+}
+
+.keypad-column {
+display: flex;
+flex-direction: column;
+gap: 10px;
+}
+
+.keypad-btn {
+width: 70px; /* کمی بزرگتر */
+height: 70px;
+font-size: 2rem; /* بزرگتر برای اعداد */
+font-weight: bold;
+border-radius: 20px; /* مربع با گوشه‌های گرد */
+border: none;
+cursor: pointer;
+background-color: var(--keypad-bg);
+color: white;
+box-shadow: 0 4px 0 var(--keypad-shadow);
+transition: all 0.15s ease;
+font-family: 'Vazirmatn', sans-serif;
+direction: ltr;
+unicode-bidi: embed;
+}
+
+.keypad-btn:hover {
+background-color: #95a5a6;
+transform: translateY(-3px);
+box-shadow: 0 7px 0 var(--keypad-shadow);
+}
+.keypad-btn:active {
+transform: translateY(1px);
+box-shadow: 0 2px 0 var(--keypad-shadow);
+}
+#backspace-btn {
+font-size: 1.8rem;
+background-color: var(--primary-red);
+box-shadow: 0 4px 0 #a5352a;
+}
+#backspace-btn:hover {
+background-color: #e96456;
+box-shadow: 0 7px 0 #a5352a;
+}
+#backspace-btn:active {
+box-shadow: 0 2px 0 #a5352a;
+}
+
+/* --- استایل جدید برای حالت انتخاب در تلویزیون --- */
+.tv-focus {
+transform: scale(1.15) !important;
+box-shadow: 0 0 20px 8px var(--primary-yellow) !important;
+border: 4px solid var(--primary-yellow);
+z-index: 100;
+}
+
+/* استایل اضافی برای اعداد در question-box */
+#question-box span.number {
+font-size: 3.2rem;
+font-weight: 900;
+color: #2c5d2c;
+margin: 0 5px;
+}
+
+/* Responsive برای ابرها در صفحه‌های کوچک */
+@media (max-width: 768px) {
+.cloud {
+width: 100px !important;
+height: 50px !important;
+}
+.cloud.x1 { width: 150px !important; height: 45px !important; }
+.cloud.x2 { width: 180px !important; height: 60px !important; }
+.cloud.x3 { width: 120px !important; height: 35px !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- Animated Clouds -->
+<div class="cloud x1"></div>
+<div class="cloud x2"></div>
+<div class="cloud x3"></div>
+
+<div class="page-wrapper">
+
+<div id="character-mascot">
+<img src="عروسک ها/عروسک.webp" alt="شخصیت بازی">
+</div>
+
+<div class="game-container">
+<h1>☁️ شهر ابری اعداد ☁️</h1>
+<p>یکی از عملیات‌ها را برای شروع انتخاب کن!</p>
+
+<div class="operation-selector">
+<button id="add-btn" class="op-btn" onclick="selectOperation('add')">جمع (+)</button>
+<button id="subtract-btn" class="op-btn" onclick="selectOperation('subtract')">تفریق (-)</button>
+<button id="multiply-btn" class="op-btn" onclick="selectOperation('multiply')">ضرب (×)</button>
+<button id="divide-btn" class="op-btn" onclick="selectOperation('divide')">تقسیم (÷)</button>
+</div>
+
+<div id="game-area" class="game-area hidden">
+<div id="question-box">?</div>
+<div class="answer-section">
+<input type="text" id="answer-input" placeholder="جواب" maxlength="3">
+<button id="submit-btn" onclick="checkAnswer()">بررسی</button>
+</div>
+<div id="feedback"></div>
+<div id="score-area">امتیاز: <span id="score">۰</span></div>
+</div>
+</div>
+
+<!-- ساختار جدید صفحه‌کلید مجازی -->
+<div id="virtual-keypad">
+<!-- ستون چپ: اعداد 6 تا 0 -->
+<div id="keypad-col-left" class="keypad-column">
+<button class="keypad-btn" onclick="appendNumber('۶')">۶</button>
+<button class="keypad-btn" onclick="appendNumber('۷')">۷</button>
+<button class="keypad-btn" onclick="appendNumber('۸')">۸</button>
+<button class="keypad-btn" onclick="appendNumber('۹')">۹</button>
+<button class="keypad-btn" onclick="appendNumber('۰')">۰</button>
+</div>
+<!-- ستون راست: اعداد 1 تا 5 و پاک‌کن -->
+<div id="keypad-col-right" class="keypad-column">
+<button class="keypad-btn" onclick="appendNumber('۱')">۱</button>
+<button class="keypad-btn" onclick="appendNumber('۲')">۲</button>
+<button class="keypad-btn" onclick="appendNumber('۳')">۳</button>
+<button class="keypad-btn" onclick="appendNumber('۴')">۴</button>
+<button class="keypad-btn" onclick="appendNumber('۵')">۵</button>
+<button id="backspace-btn" class="keypad-btn" onclick="backspace()">⌫</button>
+</div>
+</div>
+
+</div>
+
+<!-- Audio Elements -->
+<audio id="correct-sound" src="آفرین/دست.mp3" preload="auto"></audio>
+<audio id="incorrect-sound" src="آفرین/باخت.mp3" preload="auto"></audio>
+<audio id="click-sound" src="sounds/click.mp3" preload="auto"></audio>
+
+<!-- Confetti Library -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+<script>
+// DOM Elements
+const gameArea = document.getElementById('game-area');
+const questionBox = document.getElementById('question-box');
+const answerInput = document.getElementById('answer-input');
+const feedback = document.getElementById('feedback');
+const scoreSpan = document.getElementById('score');
+const mascotImg = document.querySelector('#character-mascot img');
+const virtualKeypad = document.getElementById('virtual-keypad');
+const submitBtn = document.getElementById('submit-btn');
+
+// Sound Elements
+const correctSound = document.getElementById('correct-sound');
+const incorrectSound = document.getElementById('incorrect-sound');
+const clickSound = document.getElementById('click-sound');
+const allButtons = document.querySelectorAll('button');
+
+// Game State
+let currentOperation = '';
+let num1, num2, correctAnswer;
+let score = 0;
+
+// --- متغیرهای جدید برای کنترل دو ستونی تلویزیون ---
+let isTvDevice = false;
+let navigableColumns = []; // آرایه‌ای از ستون‌ها
+let currentColumnIndex = 0; // 0 برای چپ، 1 برای راست
+let currentRowIndex = 0; // ایندکس دکمه در ستون فعلی
+
+// --- توابع تبدیل اعداد (بهبود یافته) ---
+function toPersianDigits(num) {
+  if (typeof num === 'number') {
+    return num.toString().replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+  }
+  return num.replace(/\d/g, d => '۰۱۲۳۴۵۶۷۸۹'[d]);
+}
+
+function toEnglishDigits(str) {
+  if (typeof str === 'number') {
+    return str.toString();
+  }
+  const persianDigits = '۰۱۲۳۴۵۶۷۸۹';
+  return str.replace(/[۰-۹]/g, d => persianDigits.indexOf(d));
+}
+
+// --- توابع صفحه‌کلید و کنترل تلویزیون ---
+function isTV() {
+  const tvRegex = /TV|SmartTV|Tizen|webOS|Bravia|NetCast|Roku|Viera|CrKey/i;
+  return tvRegex.test(navigator.userAgent);
+}
+
+function appendNumber(number) {
+  // فقط اعداد فارسی مجاز
+  if (/[۰-۹]/.test(number)) {
+    const currentValue = answerInput.value;
+    // اگر input خالی است یا آخرین کاراکتر عدد است، اضافه کن
+    if (currentValue.length < 3) { // حداکثر 3 رقم
+      answerInput.value = currentValue + number;
+    }
+  }
+  answerInput.focus(); // فوکوس را به input برگردان
+  answerInput.select(); // تمام متن را انتخاب کن
+}
+
+function backspace() {
+  answerInput.value = answerInput.value.slice(0, -1);
+  answerInput.focus();
+  answerInput.select();
+}
+
+function updateTvFocus() {
+  // ابتدا فوکوس را از تمام دکمه‌های قابل پیمایش پاک کن
+  navigableColumns.flat().forEach(el => el.classList.remove('tv-focus'));
+  submitBtn.classList.remove('tv-focus');
+
+  const currentColumn = navigableColumns[currentColumnIndex];
+
+  // اگر ایندکس ردیف خارج از محدوده ستون فعلی باشد (برای دکمه بررسی)
+  if (currentRowIndex >= currentColumn.length) {
+    submitBtn.classList.add('tv-focus');
+    submitBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } else {
+    const currentElement = currentColumn[currentRowIndex];
+    currentElement.classList.add('tv-focus');
+    currentElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+}
+
+// --- راه‌اندازی اولیه ---
+document.addEventListener('DOMContentLoaded', () => {
+  isTvDevice = isTV();
+  if (isTvDevice) {
+    console.log("حالت تلویزیون فعال شد.");
+    const leftColButtons = Array.from(document.querySelectorAll('#keypad-col-left .keypad-btn'));
+    const rightColButtons = Array.from(document.querySelectorAll('#keypad-col-right .keypad-btn'));
+    navigableColumns = [leftColButtons, rightColButtons];
+  }
+  
+  // تست لود شدن تصاویر ابر
+  console.log("ابرهای متحرک فعال شدند! 🎮☁️");
+  
+  // دیباگ ابرها برای اطمینان از لود شدن
+  const allClouds = document.querySelectorAll('.cloud');
+  console.log(`تعداد کل ابرها: ${allClouds.length}`);
+});
+
+allButtons.forEach(button => {
+  button.addEventListener('click', () => {
+    clickSound.currentTime = 0;
+    clickSound.play().catch(e => console.log("Error playing sound:", e));
+  });
+});
+
+// محدود کردن input فقط به اعداد فارسی
+answerInput.addEventListener('input', function(e) {
+  // فقط اعداد فارسی مجاز
+  this.value = this.value.replace(/[^۰-۹]/g, '');
+  // حداکثر 3 رقم
+  if (this.value.length > 3) {
+    this.value = this.value.slice(0, 3);
+  }
+});
+
+answerInput.addEventListener('keydown', function(event) {
+  if (event.key === 'Enter' && !isTvDevice) {
+    checkAnswer();
+  }
+  // فقط اعداد و Backspace مجاز
+  if (!/[۰-۹]/.test(event.key) && event.key !== 'Backspace' && event.key !== 'Delete' && event.key !== 'ArrowLeft' && event.key !== 'ArrowRight' && event.key !== 'Tab') {
+    event.preventDefault();
+  }
+});
+
+// --- مدیریت رویدادهای کیبورد برای تلویزیون (منطق جدید) ---
+document.addEventListener('keydown', (event) => {
+  if (!isTvDevice || gameArea.classList.contains('hidden')) return;
+  event.preventDefault();
+
+  let currentColumn = navigableColumns[currentColumnIndex];
+
+  switch (event.key) {
+    case 'ArrowDown':
+      // اگر روی آخرین دکمه ستون هستیم، به دکمه "بررسی" برو
+      if (currentRowIndex === currentColumn.length - 1) {
+        currentRowIndex++; // ایندکس را خارج از محدوده قرار می‌دهیم تا دکمه بررسی انتخاب شود
+      } else if (currentRowIndex < currentColumn.length - 1) {
+        currentRowIndex++;
+      }
+      updateTvFocus();
+      break;
+
+    case 'ArrowUp':
+      // اگر روی دکمه "بررسی" هستیم، به آخرین دکمه ستون برگرد
+      if (currentRowIndex >= currentColumn.length) {
+        currentRowIndex = currentColumn.length - 1;
+      } else if (currentRowIndex > 0) {
+        currentRowIndex--;
+      }
+      updateTvFocus();
+      break;
+
+    case 'ArrowRight':
+      if (currentColumnIndex === 0) { // اگر در ستون چپ هستیم
+        currentColumnIndex = 1; // به ستون راست برو
+        // سعی کن ردیف را حفظ کنی، اگر ستون جدید کوتاه‌تر بود، به آخرین آیتم برو
+        currentRowIndex = Math.min(currentRowIndex, navigableColumns[1].length - 1);
+      }
+      updateTvFocus();
+      break;
+
+    case 'ArrowLeft':
+      if (currentColumnIndex === 1) { // اگر در ستون راست هستیم
+        currentColumnIndex = 0; // به ستون چپ برو
+        currentRowIndex = Math.min(currentRowIndex, navigableColumns[0].length - 1);
+      }
+      updateTvFocus();
+      break;
+
+    case 'Enter':
+    case 'Ok':
+      if (currentRowIndex >= currentColumn.length) {
+        submitBtn.click();
+      } else {
+        navigableColumns[currentColumnIndex][currentRowIndex].click();
+      }
+      break;
+  }
+});
+
+function updateMascot(state) {
+  if (state === 'happy') mascotImg.src = 'عروسک ها/عروسک1.webp';
+  else if (state === 'sad') mascotImg.src = 'عروسک ها/عروسک2.webp';
+  else mascotImg.src = 'عروسک ها/عروسک.webp';
+  mascotImg.classList.remove('happy-animation', 'sad-animation');
+  if (state === 'happy') mascotImg.classList.add('happy-animation');
+  if (state === 'sad') mascotImg.classList.add('sad-animation');
+}
+
+function selectOperation(op) {
+  currentOperation = op;
+  score = 0;
+  updateScore();
+  gameArea.classList.remove('hidden');
+  virtualKeypad.classList.add('visible');
+  generateQuestion();
+  updateMascot('idle');
+
+  if (isTvDevice) {
+    currentColumnIndex = 1; // شروع از ستون راست (اعداد 1 تا 5)
+    currentRowIndex = 0; // شروع از اولین دکمه
+    updateTvFocus();
+  } else {
+    answerInput.focus(); // فوکوس را به input بده
+    answerInput.value = '';
+  }
+}
+
+function generateQuestion() {
+  feedback.innerHTML = '';
+  feedback.className = '';
+  answerInput.value = '';
+  if (!isTvDevice) {
+    answerInput.focus();
+    answerInput.select();
+  }
+
+  if (currentOperation === 'add') {
+    num1 = Math.floor(Math.random() * 20) + 1;
+    num2 = Math.floor(Math.random() * 20) + 1;
+    correctAnswer = num1 + num2;
+    questionBox.innerHTML = `<span class="number">${toPersianDigits(num1)}</span> + <span class="number">${toPersianDigits(num2)}</span> = ?`;
+  } else if (currentOperation === 'subtract') {
+    num1 = Math.floor(Math.random() * 30) + 1;
+    num2 = Math.floor(Math.random() * num1) + 1;
+    correctAnswer = num1 - num2;
+    questionBox.innerHTML = `<span class="number">${toPersianDigits(num1)}</span> - <span class="number">${toPersianDigits(num2)}</span> = ?`;
+  } else if (currentOperation === 'multiply') {
+    num1 = Math.floor(Math.random() * 10) + 1;
+    num2 = Math.floor(Math.random() * 10) + 1;
+    correctAnswer = num1 * num2;
+    questionBox.innerHTML = `<span class="number">${toPersianDigits(num1)}</span> × <span class="number">${toPersianDigits(num2)}</span> = ?`;
+  } else if (currentOperation === 'divide') {
+    let divisor = Math.floor(Math.random() * 9) + 2;
+    let result = Math.floor(Math.random() * 9) + 2;
+    num1 = divisor * result;
+    num2 = divisor;
+    correctAnswer = result;
+    questionBox.innerHTML = `<span class="number">${toPersianDigits(num1)}</span> ÷ <span class="number">${toPersianDigits(num2)}</span> = ?`;
+  }
+}
+
+function triggerCelebration() {
+  const duration = 2 * 1000;
+  const animationEnd = Date.now() + duration;
+  const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+  function randomInRange(min, max) { return Math.random() * (max - min) + min; }
+  const interval = setInterval(function() {
+    const timeLeft = animationEnd - Date.now();
+    if (timeLeft <= 0) return clearInterval(interval);
+    const particleCount = 50 * (timeLeft / duration);
+    confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+    confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+  }, 250);
+}
+
+function checkAnswer() {
+  const userInput = answerInput.value.trim();
+  if (userInput === '') {
+    feedback.innerHTML = '<span>❌</span> لطفاً یک عدد وارد کن!';
+    feedback.className = 'incorrect';
+    return;
+  }
+  
+  const userAnswer = parseInt(toEnglishDigits(userInput));
+  
+  if (isNaN(userAnswer)) {
+    feedback.innerHTML = '<span>❌</span> لطفاً فقط عدد وارد کن!';
+    feedback.className = 'incorrect';
+    return;
+  }
+  
+  if (userAnswer === correctAnswer) {
+    feedback.innerHTML = '<span>✔️</span> 🎉 آفرین! درست بود! 🎉';
+    feedback.className = 'correct';
+    score++;
+    updateScore();
+    updateMascot('happy');
+    correctSound.currentTime = 0;
+    correctSound.play().catch(e => console.log("Error playing sound:", e));
+    triggerCelebration();
+    setTimeout(() => {
+      generateQuestion();
+      updateMascot('idle');
+    }, 2500);
+  } else {
+    feedback.innerHTML = `<span>❌</span> دوباره تلاش کن`;
+    feedback.className = 'incorrect';
+    incorrectSound.currentTime = 0;
+    incorrectSound.play().catch(e => console.log("Error playing sound:", e));
+    if(score > 0) score--;
+    updateScore();
+    updateMascot('sad');
+    setTimeout(() => updateMascot('idle'), 2000);
+  }
+}
+
+function updateScore() {
+  scoreSpan.textContent = toPersianDigits(score);
+}
+
+// تست اولیه
+console.log("شهر ابری اعداد با ابرهای متحرک آماده است! 🎮☁️");
+</script>
+</body>
+</html>
